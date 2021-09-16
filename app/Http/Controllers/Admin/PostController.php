@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Post;
 use App\Category;
+use App\Tag;
 
 class PostController extends Controller
 {
@@ -30,7 +31,8 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.posts.create', compact('categories'));
+        $tags = Tag::all();
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -70,7 +72,16 @@ class PostController extends Controller
 
         
         $new_Post->fill($newPost);
+
+        // con il save() salviamo i dati della tabella post
         $new_Post->save();
+
+        // se ci sono salva i dati nella tabella ponte
+        // la funzione array_key_exists ritorna vero se in quel array e' presente una key che si chiamo tags
+        if(array_key_exists('tags' ,$newPost)){
+            $new_Post->tags()->attach($newPost['tags']);
+        }
+        
 
         return redirect()->route('admin.posts.index')->with('creato' , 'Hai creato l\' elemento id #' . $new_Post->id);
     }
@@ -147,8 +158,9 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        
+        $post->tags()->detach();
         $post->delete();
+        
 
         return redirect()->route('admin.posts.index')->with('cancella','Hai cancellato l\'elemento #' . $post->id);
     }

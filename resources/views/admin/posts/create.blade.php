@@ -65,6 +65,21 @@
             <div class="alert alert-danger mt-3">{{ $message }}</div>
         @enderror
     </div>
+
+    {{-- TAGS --}}
+
+    <div>
+        <h4>tags</h4>
+        @foreach ($tags as $tag)
+        <div class="formcheck"></div>
+            <input class="form-check-input" id="tag{{ $loop->iteration }}" type="checkbox" value="{{ $tag->id }}" name="tags[]"
+            @if (in_array($tag->id, old('tags', [])))
+                checked
+            @endif
+            >
+            <label class="form-check-label" for="tag{{ $loop->iteration }}">{{ $tag->name }}</label>
+        @endforeach
+    </div>
     <div class="mt-3">
 
         <a href="{{route("admin.posts.index")}}" class="btn btn-light">indietro</a>
